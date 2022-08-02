@@ -24,13 +24,28 @@ public class HabrCareerParse {
                 Element linkElement = titleElement.child(0);
                 String vacancyName = titleElement.text();
                 Element dateElement = row.select(".vacancy-card__date").first();
-                Element datelinkElement = dateElement.child(0);
-                LocalDate date = LocalDate.parse(datelinkElement.attr("datetime"), DateTimeFormatter.ISO_DATE_TIME);
+                Element dateLinkElement = dateElement.child(0);
+                LocalDate date = LocalDate.parse(dateLinkElement.attr("datetime"), DateTimeFormatter.ISO_DATE_TIME);
                 String link = String.format("%s%s", SOURCE_LINK, linkElement.attr("href"));
+                Element vacancyElement = row.select(".vacancy-card__icon-link").first();
                 System.out.printf("%s %s %s%n", vacancyName, link, date);
+                String linkVacancy = vacancyElement.attr("href");
+                try {
+                   String description = retrieveDescription(linkVacancy);
+                    System.out.printf(" Описание вакансии%n %s%n", description);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             });
             index++;
         }
+    }
+
+    private static String retrieveDescription(String link) throws IOException {
+        Connection connection = Jsoup.connect(String.format("%s/" + link, SOURCE_LINK));
+        Document document = connection.get();
+        Elements element =   document.select(".style-ugc");
+        return element.text();
     }
 }
 
