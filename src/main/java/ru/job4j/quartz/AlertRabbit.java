@@ -2,13 +2,14 @@ package ru.job4j.quartz;
 
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Properties;
 
 
@@ -54,14 +55,13 @@ public class AlertRabbit {
     }
 
     public static int getperiod() {
-        int period = 0;
+        int period;
         Properties properties = new Properties();
         try (InputStream in = AlertRabbit.class.getClassLoader().getResourceAsStream("rabbit.properties")) {
             properties.load(in);
           period = Integer.valueOf(properties.getProperty("rabbit.interval"));
-            return period;
-        } catch (Exception e) {
-            e.fillInStackTrace();
+        } catch (IOException e) {
+            throw new IllegalArgumentException();
         }
         return period;
     }
